@@ -1,0 +1,209 @@
+.home-page__hello {
+  display: block;
+  margin-top: 4rpx;
+  color: #3d4a3d;
+  font-size: 24rpx;
+}
+
+.home-page__sync {
+  height: 64rpx;
+  padding: 0 24rpx;
+  border-radius: 999rpx;
+  background: #e8f0e4;
+  color: #006d33;
+  font-size: 24rpx;
+}
+
+.wallet-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28rpx;
+  padding: 36rpx;
+  background: #07c160;
+  color: #00471f;
+  box-shadow: 0 12rpx 28rpx rgba(0, 109, 51, 0.18);
+}
+
+.wallet-card::after {
+  content: "";
+  position: absolute;
+  top: -60rpx;
+  right: -60rpx;
+  width: 220rpx;
+  height: 220rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.wallet-card__label,
+.wallet-card__meta {
+  display: block;
+  font-size: 24rpx;
+  opacity: 0.82;
+}
+
+.wallet-card__amount {
+  display: block;
+  margin-top: 10rpx;
+  color: #ffffff;
+  font-size: 58rpx;
+  font-weight: 750;
+}
+
+.wallet-card__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24rpx;
+  margin-top: 36rpx;
+}
+
+.wallet-card__value {
+  display: block;
+  margin-top: 6rpx;
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.budget-line {
+  margin-top: 32rpx;
+  color: #ffffff;
+  font-size: 24rpx;
+}
+
+.budget-line__track {
+  height: 14rpx;
+  margin-top: 12rpx;
+  border-radius: 999rpx;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.budget-line__bar {
+  height: 100%;
+  border-radius: 999rpx;
+  background: #ffffff;
+}
+
+.shortcut-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18rpx;
+  margin: 28rpx 0 34rpx;
+}
+
+.shortcut {
+  min-height: 132rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  color: #161d16;
+  font-size: 23rpx;
+  text-align: center;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.shortcut__icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: #e8f0e4;
+  color: #006d33;
+  font-weight: 800;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18rpx;
+}
+
+.section-more {
+  color: #006d33;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.record-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.record-card {
+  min-height: 112rpx;
+  padding: 18rpx 22rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.record-card__icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.record-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.record-card__name {
+  display: block;
+  color: #161d16;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.insight-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18rpx;
+  margin-top: 26rpx;
+}
+
+.insight-card {
+  min-height: 176rpx;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.insight-card--warm {
+  background: #ffddb7;
+  color: #2a1700;
+}
+
+.insight-card--soft {
+  background: #ffdad5;
+  color: #410001;
+}
+
+.insight-card__label {
+  font-size: 22rpx;
+  font-weight: 700;
+}
+
+.insight-card__text {
+  font-size: 26rpx;
+  line-height: 36rpx;
+}

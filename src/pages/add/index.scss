@@ -1,0 +1,243 @@
+.add-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f3fcf0;
+}
+
+.add-header {
+  padding: 24rpx 32rpx 26rpx;
+  background: #ffffff;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.type-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12rpx;
+  padding: 8rpx;
+  border-radius: 24rpx;
+  background: #e8f0e4;
+}
+
+.type-tab {
+  height: 72rpx;
+  border-radius: 18rpx;
+  color: #3d4a3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  font-weight: 650;
+}
+
+.type-tab--active {
+  background: #ffffff;
+  color: #006d33;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.amount-line {
+  margin-top: 30rpx;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 12rpx;
+}
+
+.amount-line__currency {
+  color: #3d4a3d;
+  font-size: 28rpx;
+}
+
+.amount-line__number {
+  color: #006d33;
+  font-size: 64rpx;
+  font-weight: 800;
+}
+
+.add-scroll {
+  flex: 1;
+  overflow: auto;
+  padding: 24rpx 32rpx 350rpx;
+}
+
+.form-section {
+  margin-bottom: 28rpx;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 14rpx;
+  color: #3d4a3d;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14rpx;
+}
+
+.category-item {
+  min-height: 128rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  color: #161d16;
+  font-size: 23rpx;
+  text-align: center;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.category-item__icon {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: #e8f0e4;
+  color: #006d33;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 800;
+}
+
+.category-item--active {
+  background: #07c160;
+  color: #ffffff;
+}
+
+.category-item--active .category-item__icon {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.custom-category {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.custom-category__input {
+  flex: 1;
+  height: 76rpx;
+  padding: 0 22rpx;
+  border-radius: 20rpx;
+  background: #edf6ea;
+  font-size: 26rpx;
+}
+
+.custom-category__button {
+  width: 120rpx;
+  height: 76rpx;
+  border-radius: 20rpx;
+  background: #e8f0e4;
+  color: #006d33;
+  font-size: 26rpx;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.tag-chip {
+  height: 64rpx;
+  padding: 0 22rpx;
+  border-radius: 999rpx;
+  background: #e2ebdf;
+  color: #3d4a3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 24rpx;
+}
+
+.tag-chip--active {
+  background: #07c160;
+  color: #ffffff;
+}
+
+.field-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.field-row,
+.note-row {
+  min-height: 92rpx;
+  padding: 0 24rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  color: #161d16;
+  font-size: 28rpx;
+  text-align: center;
+}
+
+.field-row__value {
+  color: #006d33;
+  font-weight: 650;
+}
+
+.note-row {
+  align-items: flex-start;
+  padding: 24rpx;
+  gap: 18rpx;
+}
+
+.note-row__textarea {
+  flex: 1;
+  min-height: 68rpx;
+  color: #161d16;
+  font-size: 26rpx;
+  text-align: right;
+}
+
+.keypad {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 112rpx;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rpx;
+  background: #d4ddd1;
+  border-top: 1rpx solid #bbcbba;
+}
+
+.keypad__button {
+  height: 94rpx;
+  border-radius: 0;
+  background: #ffffff;
+  color: #161d16;
+  font-size: 34rpx;
+  font-weight: 650;
+  text-align: center;
+}
+
+.keypad__button--soft {
+  color: #006d33;
+  background: #edf6ea;
+  font-size: 26rpx;
+}
+
+.keypad__button--ok {
+  grid-row: span 2;
+  height: auto;
+  background: #07c160;
+  color: #ffffff;
+  font-size: 28rpx;
+}

@@ -1,0 +1,124 @@
+.bills-search {
+  margin-bottom: 18rpx;
+}
+
+.bills-search__input {
+  height: 88rpx;
+  padding: 0 28rpx;
+  border-radius: 24rpx;
+  background: #edf6ea;
+  color: #161d16;
+  font-size: 28rpx;
+}
+
+.filter-row {
+  display: flex;
+  gap: 14rpx;
+  overflow: hidden;
+  margin-bottom: 18rpx;
+}
+
+.filter-chip {
+  height: 68rpx;
+  padding: 0 24rpx;
+  border-radius: 999rpx;
+  background: #e2ebdf;
+  color: #3d4a3d;
+  font-size: 25rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.filter-chip--active {
+  background: #07c160;
+  color: #00471f;
+  font-weight: 700;
+}
+
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12rpx;
+  margin-bottom: 24rpx;
+  padding: 22rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.summary-strip__value {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.bill-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.bill-group__head {
+  margin: 0 8rpx 12rpx;
+  display: flex;
+  justify-content: space-between;
+  color: #3d4a3d;
+  font-size: 23rpx;
+}
+
+.bill-card {
+  margin-bottom: 12rpx;
+  padding: 18rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.bill-card__main {
+  min-height: 82rpx;
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+}
+
+.bill-card__icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 800;
+}
+
+.bill-card__body {
+  flex: 1;
+}
+
+.bill-card__title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 650;
+}
+
+.bill-card__delete {
+  margin-top: 12rpx;
+  margin-left: auto;
+  width: 112rpx;
+  height: 54rpx;
+  border-radius: 999rpx;
+  background: #ffdad6;
+  color: #93000a;
+  font-size: 24rpx;
+}
+
+.empty {
+  padding: 80rpx 0;
+  color: #3d4a3d;
+  text-align: center;
+  font-size: 26rpx;
+}

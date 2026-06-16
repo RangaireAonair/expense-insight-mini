@@ -1,0 +1,48 @@
+{
+  "name": "money-ledger-miniprogram",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WeChat mini program money ledger built with Taro, React and TypeScript.",
+  "packageManager": "pnpm@9.15.9",
+  "scripts": {
+    "dev:weapp": "taro build --type weapp --watch",
+    "build:weapp": "taro build --type weapp",
+    "build": "taro build --type weapp",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@babel/runtime": "7.24.0",
+    "@tarojs/components": "3.6.35",
+    "@tarojs/helper": "3.6.35",
+    "@tarojs/plugin-framework-react": "3.6.35",
+    "@tarojs/plugin-platform-weapp": "3.6.35",
+    "@tarojs/react": "3.6.35",
+    "@tarojs/runtime": "3.6.35",
+    "@tarojs/shared": "3.6.35",
+    "@tarojs/taro": "3.6.35",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "7.24.0",
+    "@tarojs/cli": "3.6.35",
+    "@tarojs/webpack5-runner": "3.6.35",
+    "@types/node": "20.11.30",
+    "@types/react": "18.2.73",
+    "babel-preset-taro": "3.6.35",
+    "sass": "1.72.0",
+    "typescript": "5.4.4",
+    "webpack": "5.91.0",
+    "webpack-chain": "6.5.1"
+  },
+  "overrides": {
+    "@tarojs/components": "3.6.35",
+    "@tarojs/helper": "3.6.35",
+    "@tarojs/plugin-framework-react": "3.6.35",
+    "@tarojs/plugin-platform-weapp": "3.6.35",
+    "@tarojs/react": "3.6.35",
+    "@tarojs/runtime": "3.6.35",
+    "@tarojs/shared": "3.6.35",
+    "@tarojs/taro": "3.6.35"
+  }
+}
