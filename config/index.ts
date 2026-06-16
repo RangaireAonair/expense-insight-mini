@@ -3,7 +3,7 @@ import path from 'path'
 import devConfig from './dev'
 import prodConfig from './prod'
 
-export default defineConfig(async (merge, { command, mode }) => {
+export default defineConfig(async (merge, { command: _command, mode: _mode }) => {
   const baseConfig = {
     projectName: 'money-ledger-miniprogram',
     date: '2026-06-16',

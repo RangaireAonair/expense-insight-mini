@@ -2,13 +2,7 @@ import { Button, Text, View } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { useState } from 'react'
 import BottomNav from '@/components/BottomNav'
-import {
-  getCategoryTotals,
-  getDashboardStats,
-  getMonthRecords,
-  loadState,
-  syncToCloud
-} from '@/store/finance'
+import { getCategoryTotals, getDashboardStats, getMonthRecords, loadState, syncToCloud } from '@/store/finance'
 import { FinanceState } from '@/types'
 import { clampPercent, currentMonth, formatMoney, getAccount, getCategory, signedMoney } from '@/utils/format'
 import './index.scss'
@@ -101,7 +95,10 @@ export default function HomePage() {
           const account = getAccount(state.accounts, record.accountId)
           return (
             <View key={record.id} className="record-card">
-              <View className="record-card__icon" style={{ background: `${category?.color || '#006d33'}1a`, color: category?.color }}>
+              <View
+                className="record-card__icon"
+                style={{ background: `${category?.color || '#006d33'}1a`, color: category?.color }}
+              >
                 <Text>{category?.icon || '账'}</Text>
               </View>
               <View className="record-card__body">

@@ -1,14 +1,5 @@
 import Taro from '@tarojs/taro'
-import {
-  Account,
-  Budget,
-  Category,
-  FinanceState,
-  MoneyRecord,
-  RecordType,
-  Tag,
-  UserProfile
-} from '@/types'
+import { Account, Budget, Category, FinanceState, MoneyRecord, RecordType, Tag, UserProfile } from '@/types'
 import { createId, currentMonth, monthOf, sumByType, todayISO, yearOf } from '@/utils/format'
 
 const STORAGE_KEY = 'money-ledger-state-v1'
@@ -286,15 +277,17 @@ export function getMonthlyTrend(state: FinanceState, months = 6) {
 }
 
 export async function syncToCloud(state: FinanceState) {
-  const cloud = (Taro as unknown as {
-    cloud?: {
-      database: () => {
-        collection: (name: string) => {
-          add: (payload: { data: Record<string, unknown> }) => Promise<unknown>
+  const cloud = (
+    Taro as unknown as {
+      cloud?: {
+        database: () => {
+          collection: (name: string) => {
+            add: (payload: { data: Record<string, unknown> }) => Promise<unknown>
+          }
         }
       }
     }
-  }).cloud
+  ).cloud
 
   if (!cloud) {
     saveState(state)

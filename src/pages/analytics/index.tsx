@@ -1,8 +1,15 @@
 import { Canvas, Picker, Text, View } from '@tarojs/components'
 import Taro, { useDidShow, useReady } from '@tarojs/taro'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import BottomNav from '@/components/BottomNav'
-import { getCategoryTotals, getDashboardStats, getMonthRecords, getMonthlyTrend, getYearRecords, loadState } from '@/store/finance'
+import {
+  getCategoryTotals,
+  getDashboardStats,
+  getMonthRecords,
+  getMonthlyTrend,
+  getYearRecords,
+  loadState
+} from '@/store/finance'
 import { FinanceState, RecordType } from '@/types'
 import { clampPercent, formatMoney } from '@/utils/format'
 import './index.scss'
@@ -18,75 +25,52 @@ export default function AnalyticsPage() {
   const [year, setYear] = useState(new Date().toISOString().slice(0, 4))
 
   useDidShow(() => setState(loadState()))
-  useReady(() => setTimeout(() => drawCharts(), 100))
-  useEffect(() => {
-    setTimeout(() => drawCharts(), 100)
-  }, [state, type, month, year, rangeIndex])
 
-  const records = rangeIndex === 0 ? getMonthRecords(state, month) : getYearRecords(state, year)
-  const stats = rangeIndex === 0 ? getDashboardStats(state, month) : {
-    expense: records.filter((item) => item.type === 'expense').reduce((sum, item) => sum + item.amount, 0),
-    income: records.filter((item) => item.type === 'income').reduce((sum, item) => sum + item.amount, 0),
-    balance: 0,
-    budgetUsage: 0,
-    totalBudget: 0,
-    records
-  }
+  const records = useMemo(
+    () => (rangeIndex === 0 ? getMonthRecords(state, month) : getYearRecords(state, year)),
+    [month, rangeIndex, state, year]
+  )
+
+  const stats = useMemo(() => {
+    if (rangeIndex === 0) return getDashboardStats(state, month)
+
+    const expense = records.filter((item) => item.type === 'expense').reduce((sum, item) => sum + item.amount, 0)
+    const income = records.filter((item) => item.type === 'income').reduce((sum, item) => sum + item.amount, 0)
+
+    return {
+      expense,
+      income,
+      balance: income - expense,
+      budgetUsage: 0,
+      totalBudget: 0,
+      records
+    }
+  }, [month, rangeIndex, records, state])
+
   const categoryTotals = useMemo(() => getCategoryTotals(state, records, type), [records, state, type])
-  const trend = getMonthlyTrend(state)
+  const trend = useMemo(() => getMonthlyTrend(state), [state])
 
-  function drawCharts() {
+  const drawCharts = useCallback(() => {
     drawPie(categoryTotals.map((item) => ({ value: item.total, color: item.category.color })))
     drawTrend(trend)
-  }
+  }, [categoryTotals, trend])
 
-  function drawPie(items: Array<{ value: number; color: string }>) {
-    const ctx = Taro.createCanvasContext('pieCanvas')
-    const total = items.reduce((sum, item) => sum + item.value, 0) || 1
-    let start = -Math.PI / 2
-    ctx.clearRect(0, 0, 220, 220)
-    items.forEach((item) => {
-      const angle = (item.value / total) * Math.PI * 2
-      ctx.beginPath()
-      ctx.moveTo(110, 110)
-      ctx.arc(110, 110, 88, start, start + angle)
-      ctx.setFillStyle(item.color)
-      ctx.fill()
-      start += angle
-    })
-    ctx.beginPath()
-    ctx.arc(110, 110, 54, 0, Math.PI * 2)
-    ctx.setFillStyle('#ffffff')
-    ctx.fill()
-    ctx.draw()
-  }
+  useReady(() => setTimeout(drawCharts, 100))
 
-  function drawTrend(rows: Array<{ month: string; income: number; expense: number }>) {
-    const ctx = Taro.createCanvasContext('trendCanvas')
-    const width = 320
-    const height = 150
-    const padding = 18
-    const max = Math.max(...rows.map((item) => Math.max(item.income, item.expense)), 1)
-    ctx.clearRect(0, 0, width, height)
-    ctx.setStrokeStyle('#dce5d9')
-    ctx.setLineWidth(1)
-    for (let i = 1; i <= 3; i += 1) {
-      const y = (height / 4) * i
-      ctx.beginPath()
-      ctx.moveTo(padding, y)
-      ctx.lineTo(width - padding, y)
-      ctx.stroke()
-    }
-    drawLine(ctx, rows.map((item) => item.income), max, '#006d33', width, height, padding)
-    drawLine(ctx, rows.map((item) => item.expense), max, '#ba1a1a', width, height, padding)
-    ctx.draw()
-  }
+  useEffect(() => {
+    setTimeout(drawCharts, 100)
+  }, [drawCharts])
 
   return (
     <View className="page analytics-page">
       <View className="top-title">
         <Text className="brand">统计报表</Text>
-        <Picker mode="selector" range={rangeLabels} value={rangeIndex} onChange={(event) => setRangeIndex(Number(event.detail.value))}>
+        <Picker
+          mode="selector"
+          range={rangeLabels}
+          value={rangeIndex}
+          onChange={(event) => setRangeIndex(Number(event.detail.value))}
+        >
           <View className="ghost-button">{rangeLabels[rangeIndex]}</View>
         </Picker>
       </View>
@@ -96,12 +80,17 @@ export default function AnalyticsPage() {
           {tabLabels.map((label, index) => {
             const value: RecordType = index === 0 ? 'expense' : 'income'
             return (
-              <View key={label} className={`segment__item ${type === value ? 'segment__item--active' : ''}`} onClick={() => setType(value)}>
+              <View
+                key={label}
+                className={`segment__item ${type === value ? 'segment__item--active' : ''}`}
+                onClick={() => setType(value)}
+              >
                 {label}
               </View>
             )
           })}
         </View>
+
         {rangeIndex === 0 ? (
           <Picker mode="date" fields="month" value={month} onChange={(event) => setMonth(String(event.detail.value))}>
             <View className="period-card">
@@ -175,7 +164,10 @@ export default function AnalyticsPage() {
           const percent = clampPercent((item.total / (base || 1)) * 100)
           return (
             <View key={item.category.id} className="top-item">
-              <View className="top-item__icon" style={{ color: item.category.color, background: `${item.category.color}1a` }}>
+              <View
+                className="top-item__icon"
+                style={{ color: item.category.color, background: `${item.category.color}1a` }}
+              >
                 {item.category.icon}
               </View>
               <View className="top-item__body">
@@ -198,6 +190,69 @@ export default function AnalyticsPage() {
 }
 
 type CanvasCtx = ReturnType<typeof Taro.createCanvasContext>
+
+function drawPie(items: Array<{ value: number; color: string }>) {
+  const ctx = Taro.createCanvasContext('pieCanvas')
+  const total = items.reduce((sum, item) => sum + item.value, 0) || 1
+  let start = -Math.PI / 2
+
+  ctx.clearRect(0, 0, 220, 220)
+  items.forEach((item) => {
+    const angle = (item.value / total) * Math.PI * 2
+    ctx.beginPath()
+    ctx.moveTo(110, 110)
+    ctx.arc(110, 110, 88, start, start + angle)
+    ctx.setFillStyle(item.color)
+    ctx.fill()
+    start += angle
+  })
+
+  ctx.beginPath()
+  ctx.arc(110, 110, 54, 0, Math.PI * 2)
+  ctx.setFillStyle('#ffffff')
+  ctx.fill()
+  ctx.draw()
+}
+
+function drawTrend(rows: Array<{ month: string; income: number; expense: number }>) {
+  const ctx = Taro.createCanvasContext('trendCanvas')
+  const width = 320
+  const height = 150
+  const padding = 18
+  const max = Math.max(...rows.map((item) => Math.max(item.income, item.expense)), 1)
+
+  ctx.clearRect(0, 0, width, height)
+  ctx.setStrokeStyle('#dce5d9')
+  ctx.setLineWidth(1)
+
+  for (let i = 1; i <= 3; i += 1) {
+    const y = (height / 4) * i
+    ctx.beginPath()
+    ctx.moveTo(padding, y)
+    ctx.lineTo(width - padding, y)
+    ctx.stroke()
+  }
+
+  drawLine(
+    ctx,
+    rows.map((item) => item.income),
+    max,
+    '#006d33',
+    width,
+    height,
+    padding
+  )
+  drawLine(
+    ctx,
+    rows.map((item) => item.expense),
+    max,
+    '#ba1a1a',
+    width,
+    height,
+    padding
+  )
+  ctx.draw()
+}
 
 function drawLine(
   ctx: CanvasCtx,

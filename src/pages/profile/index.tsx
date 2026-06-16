@@ -2,7 +2,15 @@ import { Button, Image, Picker, Switch, Text, View } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { useState } from 'react'
 import BottomNav from '@/components/BottomNav'
-import { exportCsv, loadState, resetState, saveState, setUserProfile, syncToCloud, updateSettings } from '@/store/finance'
+import {
+  exportCsv,
+  loadState,
+  resetState,
+  saveState,
+  setUserProfile,
+  syncToCloud,
+  updateSettings
+} from '@/store/finance'
 import { AppSettings, FinanceState } from '@/types'
 import './index.scss'
 
@@ -109,13 +117,23 @@ export default function ProfilePage() {
 
       <View className="setting-group">
         <Text className="setting-group__title">系统设置</Text>
-        <Picker mode="selector" range={themes} value={themes.indexOf(state.settings.theme)} onChange={(event) => patchSettings({ theme: themes[Number(event.detail.value)] })}>
+        <Picker
+          mode="selector"
+          range={themes}
+          value={themes.indexOf(state.settings.theme)}
+          onChange={(event) => patchSettings({ theme: themes[Number(event.detail.value)] })}
+        >
           <View className="setting-row">
             <Text>主题模式</Text>
             <Text>{state.settings.theme === 'light' ? '浅色' : '深色'}</Text>
           </View>
         </Picker>
-        <Picker mode="selector" range={currencies} value={currencies.indexOf(state.settings.currency)} onChange={(event) => patchSettings({ currency: currencies[Number(event.detail.value)] })}>
+        <Picker
+          mode="selector"
+          range={currencies}
+          value={currencies.indexOf(state.settings.currency)}
+          onChange={(event) => patchSettings({ currency: currencies[Number(event.detail.value)] })}
+        >
           <View className="setting-row">
             <Text>货币单位</Text>
             <Text>{state.settings.currency}</Text>
@@ -123,7 +141,11 @@ export default function ProfilePage() {
         </Picker>
         <View className="setting-row">
           <Text>隐私金额隐藏</Text>
-          <Switch checked={state.settings.privacyMode} color="#07c160" onChange={(event) => patchSettings({ privacyMode: event.detail.value })} />
+          <Switch
+            checked={state.settings.privacyMode}
+            color="#07c160"
+            onChange={(event) => patchSettings({ privacyMode: event.detail.value })}
+          />
         </View>
       </View>
 
@@ -131,15 +153,28 @@ export default function ProfilePage() {
         <Text className="setting-group__title">记账提醒</Text>
         <View className="setting-row">
           <Text>开启提醒</Text>
-          <Switch checked={state.settings.reminder.enabled} color="#07c160" onChange={(event) => patchReminder({ enabled: event.detail.value })} />
+          <Switch
+            checked={state.settings.reminder.enabled}
+            color="#07c160"
+            onChange={(event) => patchReminder({ enabled: event.detail.value })}
+          />
         </View>
-        <Picker mode="selector" range={repeats} value={repeats.indexOf(state.settings.reminder.repeat)} onChange={(event) => patchReminder({ repeat: repeats[Number(event.detail.value)] })}>
+        <Picker
+          mode="selector"
+          range={repeats}
+          value={repeats.indexOf(state.settings.reminder.repeat)}
+          onChange={(event) => patchReminder({ repeat: repeats[Number(event.detail.value)] })}
+        >
           <View className="setting-row">
             <Text>提醒频率</Text>
             <Text>{state.settings.reminder.repeat === 'daily' ? '每日' : '每周'}</Text>
           </View>
         </Picker>
-        <Picker mode="time" value={state.settings.reminder.time} onChange={(event) => patchReminder({ time: String(event.detail.value) })}>
+        <Picker
+          mode="time"
+          value={state.settings.reminder.time}
+          onChange={(event) => patchReminder({ time: String(event.detail.value) })}
+        >
           <View className="setting-row">
             <Text>提醒时间</Text>
             <Text>{state.settings.reminder.time}</Text>

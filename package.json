@@ -8,7 +8,18 @@
     "dev:weapp": "taro build --type weapp --watch",
     "build:weapp": "taro build --type weapp",
     "build": "taro build --type weapp",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" \"config/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx}\" \"config/**/*.ts\" --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky",
+    "commit": "cz",
+    "commitlint": "commitlint --from HEAD~1 --to HEAD --verbose",
+    "release": "standard-version && git push --follow-tags origin main",
+    "release:patch": "standard-version --release-as patch && git push --follow-tags origin main",
+    "release:minor": "standard-version --release-as minor && git push --follow-tags origin main",
+    "release:major": "standard-version --release-as major && git push --follow-tags origin main"
   },
   "dependencies": {
     "@babel/runtime": "7.24.0",
@@ -25,12 +36,26 @@
   },
   "devDependencies": {
     "@babel/core": "7.24.0",
+    "@commitlint/cli": "19.3.0",
+    "@commitlint/config-conventional": "19.2.2",
+    "@typescript-eslint/eslint-plugin": "7.18.0",
+    "@typescript-eslint/parser": "7.18.0",
     "@tarojs/cli": "3.6.35",
     "@tarojs/webpack5-runner": "3.6.35",
     "@types/node": "20.11.30",
     "@types/react": "18.2.73",
     "babel-preset-taro": "3.6.35",
+    "commitizen": "4.3.1",
+    "cz-git": "1.10.1",
+    "eslint": "8.57.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-react": "7.34.3",
+    "eslint-plugin-react-hooks": "4.6.2",
+    "husky": "9.1.7",
+    "lint-staged": "15.2.7",
+    "prettier": "3.3.3",
     "sass": "1.72.0",
+    "standard-version": "9.5.0",
     "typescript": "5.4.4",
     "webpack": "5.91.0",
     "webpack-chain": "6.5.1"
@@ -44,5 +69,63 @@
     "@tarojs/runtime": "3.6.35",
     "@tarojs/shared": "3.6.35",
     "@tarojs/taro": "3.6.35"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,cjs,json,md,scss,css}": [
+      "prettier --write"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
+  },
+  "standard-version": {
+    "types": [
+      {
+        "type": "feat",
+        "section": "Features"
+      },
+      {
+        "type": "fix",
+        "section": "Bug Fixes"
+      },
+      {
+        "type": "perf",
+        "section": "Performance"
+      },
+      {
+        "type": "refactor",
+        "section": "Code Refactoring"
+      },
+      {
+        "type": "docs",
+        "section": "Documentation"
+      },
+      {
+        "type": "style",
+        "section": "Styles"
+      },
+      {
+        "type": "test",
+        "section": "Tests"
+      },
+      {
+        "type": "build",
+        "section": "Build System"
+      },
+      {
+        "type": "ci",
+        "section": "Continuous Integration"
+      },
+      {
+        "type": "chore",
+        "section": "Chores"
+      }
+    ]
   }
 }

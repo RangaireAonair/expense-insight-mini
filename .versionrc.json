@@ -1,0 +1,8 @@
+{
+  "tagPrefix": "v",
+  "releaseCommitMessageFormat": "chore(release): {{currentTag}}",
+  "commitAll": true,
+  "skip": {
+    "tag": false
+  }
+}

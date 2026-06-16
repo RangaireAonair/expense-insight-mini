@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.taro/
+coverage/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+project.private.config.json

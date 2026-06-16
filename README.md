@@ -107,6 +107,68 @@ npm run build:weapp
 npm run dev:weapp     # 开发模式，监听并编译微信小程序
 npm run build:weapp   # 构建微信小程序 dist
 npm run typecheck     # TypeScript 类型检查
+npm run lint          # ESLint 检查
+npm run lint:fix      # ESLint 自动修复
+npm run format        # Prettier 格式化
+npm run format:check  # Prettier 格式检查
+npm run commit        # 调起 cz-git 交互式提交向导
+npm run release       # 生成版本、CHANGELOG、tag，并推送到远端
+```
+
+## 提交规范与质量检查
+
+项目使用 Husky + lint-staged + ESLint + Prettier + commitlint：
+
+- `pre-commit`: 对暂存文件执行 ESLint 自动修复、Prettier 格式化，并执行 `npm run typecheck`
+- `commit-msg`: 校验提交信息是否符合 Angular 风格 Conventional Commits
+- `npm run commit`: 调起 `cz-git` 交互式提交向导，按提示选择 type、scope、填写 subject/body
+- `typecheck`: 开启 `noUnusedLocals` 和 `noUnusedParameters`，用于检查已声明但未使用的变量和参数
+
+推荐提交方式：
+
+```powershell
+git add .
+npm run commit
+```
+
+提交信息格式：
+
+```text
+<type>(<scope>): <subject>
+```
+
+示例：
+
+```text
+feat(bill): add monthly filters
+fix(add): prevent invalid amount submission
+docs(readme): update setup guide
+build(release): configure changelog workflow
+```
+
+允许的 `type`：
+
+```text
+feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+```
+
+更多说明见 [`docs/commit-convention.md`](docs/commit-convention.md)。
+
+## 版本升级与 CHANGELOG
+
+项目使用 `standard-version` 基于 Conventional Commits 自动生成 `CHANGELOG.md`、升级 `package.json` / lockfile 版本、创建 release commit、创建 tag，并推送到远端。
+
+release 提交信息固定为 Angular 风格：
+
+```text
+chore(release): vX.Y.Z
+```
+
+```powershell
+npm run release        # 自动根据提交类型推断版本，并 push commit/tag
+npm run release:patch  # 手动升级 patch，并 push commit/tag
+npm run release:minor  # 手动升级 minor，并 push commit/tag
+npm run release:major  # 手动升级 major，并 push commit/tag
 ```
 
 ## 目录结构

@@ -29,7 +29,10 @@ export default function AddPage() {
   )
 
   const accountNames = state.accounts.map((account) => account.name)
-  const accountIndex = Math.max(0, state.accounts.findIndex((account) => account.id === accountId))
+  const accountIndex = Math.max(
+    0,
+    state.accounts.findIndex((account) => account.id === accountId)
+  )
 
   const append = (value: string) => {
     setAmount((current) => {
@@ -90,7 +93,10 @@ export default function AddPage() {
     <View className="add-page">
       <View className="add-header">
         <View className="type-tabs">
-          <View className={`type-tab ${type === 'expense' ? 'type-tab--active' : ''}`} onClick={() => setType('expense')}>
+          <View
+            className={`type-tab ${type === 'expense' ? 'type-tab--active' : ''}`}
+            onClick={() => setType('expense')}
+          >
             支出
           </View>
           <View className={`type-tab ${type === 'income' ? 'type-tab--active' : ''}`} onClick={() => setType('income')}>
@@ -137,7 +143,11 @@ export default function AddPage() {
           <Text className="form-label">标签</Text>
           <View className="tag-row">
             {state.tags.map((tag) => (
-              <View key={tag.id} className={`tag-chip ${selectedTags.includes(tag.id) ? 'tag-chip--active' : ''}`} onClick={() => toggleTag(tag.id)}>
+              <View
+                key={tag.id}
+                className={`tag-chip ${selectedTags.includes(tag.id) ? 'tag-chip--active' : ''}`}
+                onClick={() => toggleTag(tag.id)}
+              >
                 {tag.name}
               </View>
             ))}
@@ -145,7 +155,12 @@ export default function AddPage() {
         </View>
 
         <View className="field-list">
-          <Picker mode="selector" range={accountNames} value={accountIndex} onChange={(event) => setAccountId(state.accounts[Number(event.detail.value)].id)}>
+          <Picker
+            mode="selector"
+            range={accountNames}
+            value={accountIndex}
+            onChange={(event) => setAccountId(state.accounts[Number(event.detail.value)].id)}
+          >
             <View className="field-row">
               <Text>账户</Text>
               <Text className="field-row__value">{state.accounts[accountIndex]?.name}</Text>
@@ -159,7 +174,13 @@ export default function AddPage() {
           </Picker>
           <View className="note-row">
             <Text>备注</Text>
-            <Textarea className="note-row__textarea" value={note} placeholder="补充说明、商户、用途" autoHeight onInput={(event) => setNote(String(event.detail.value))} />
+            <Textarea
+              className="note-row__textarea"
+              value={note}
+              placeholder="补充说明、商户、用途"
+              autoHeight
+              onInput={(event) => setNote(String(event.detail.value))}
+            />
           </View>
         </View>
       </View>

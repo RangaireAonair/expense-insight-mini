@@ -78,7 +78,12 @@ export default function BillsPage() {
       </View>
 
       <View className="filter-row">
-        <Picker mode="selector" range={periodOptions} value={periodIndex} onChange={(event) => setPeriodIndex(Number(event.detail.value))}>
+        <Picker
+          mode="selector"
+          range={periodOptions}
+          value={periodIndex}
+          onChange={(event) => setPeriodIndex(Number(event.detail.value))}
+        >
           <View className="filter-chip">{periodOptions[periodIndex]}</View>
         </Picker>
         {periodIndex === 0 ? (
@@ -90,7 +95,12 @@ export default function BillsPage() {
             <View className="filter-chip filter-chip--active">{year}</View>
           </Picker>
         )}
-        <Picker mode="selector" range={typeOptions} value={typeIndex} onChange={(event) => setTypeIndex(Number(event.detail.value))}>
+        <Picker
+          mode="selector"
+          range={typeOptions}
+          value={typeIndex}
+          onChange={(event) => setTypeIndex(Number(event.detail.value))}
+        >
           <View className="filter-chip">{typeOptions[typeIndex]}</View>
         </Picker>
       </View>
@@ -114,14 +124,17 @@ export default function BillsPage() {
         {dates.length === 0 && <View className="empty">没有找到符合条件的账单</View>}
         {dates.map((date) => {
           const records = groups[date]
-          const dayExpense = records.filter((item) => item.type === 'expense').reduce((sum, item) => sum + item.amount, 0)
+          const dayExpense = records
+            .filter((item) => item.type === 'expense')
+            .reduce((sum, item) => sum + item.amount, 0)
           const dayIncome = records.filter((item) => item.type === 'income').reduce((sum, item) => sum + item.amount, 0)
           return (
             <View key={date} className="bill-group">
               <View className="bill-group__head">
                 <Text>{date}</Text>
                 <Text>
-                  支 {formatMoney(dayExpense, state.settings.currency)} / 收 {formatMoney(dayIncome, state.settings.currency)}
+                  支 {formatMoney(dayExpense, state.settings.currency)} / 收{' '}
+                  {formatMoney(dayIncome, state.settings.currency)}
                 </Text>
               </View>
               {records.map((record) => {
@@ -130,7 +143,10 @@ export default function BillsPage() {
                 return (
                   <View key={record.id} className="bill-card">
                     <View className="bill-card__main" onClick={() => editRecord(record)}>
-                      <View className="bill-card__icon" style={{ background: `${category?.color || '#006d33'}1a`, color: category?.color }}>
+                      <View
+                        className="bill-card__icon"
+                        style={{ background: `${category?.color || '#006d33'}1a`, color: category?.color }}
+                      >
                         <Text>{category?.icon || '账'}</Text>
                       </View>
                       <View className="bill-card__body">

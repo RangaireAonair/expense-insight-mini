@@ -97,7 +97,12 @@ export default function AccountsPage() {
       <View className="tool-card">
         <Text className="section-title">新增账户</Text>
         <View className="inline-form">
-          <Input className="inline-form__input" placeholder="账户名" value={newAccount} onInput={(event) => setNewAccount(String(event.detail.value))} />
+          <Input
+            className="inline-form__input"
+            placeholder="账户名"
+            value={newAccount}
+            onInput={(event) => setNewAccount(String(event.detail.value))}
+          />
           <Input
             className="inline-form__input"
             type="digit"
@@ -114,13 +119,29 @@ export default function AccountsPage() {
       <View className="tool-card">
         <Text className="section-title">账户转账</Text>
         <View className="transfer-grid">
-          <Picker mode="selector" range={accountNames} value={fromIndex} onChange={(event) => setFromIndex(Number(event.detail.value))}>
+          <Picker
+            mode="selector"
+            range={accountNames}
+            value={fromIndex}
+            onChange={(event) => setFromIndex(Number(event.detail.value))}
+          >
             <View className="select-box">从 {accountNames[fromIndex]}</View>
           </Picker>
-          <Picker mode="selector" range={accountNames} value={toIndex} onChange={(event) => setToIndex(Number(event.detail.value))}>
+          <Picker
+            mode="selector"
+            range={accountNames}
+            value={toIndex}
+            onChange={(event) => setToIndex(Number(event.detail.value))}
+          >
             <View className="select-box">到 {accountNames[toIndex]}</View>
           </Picker>
-          <Input className="select-box" type="digit" placeholder="金额" value={transferAmount} onInput={(event) => setTransferAmount(String(event.detail.value))} />
+          <Input
+            className="select-box"
+            type="digit"
+            placeholder="金额"
+            value={transferAmount}
+            onInput={(event) => setTransferAmount(String(event.detail.value))}
+          />
           <Button className="select-box select-box--button" onClick={transfer}>
             转账
           </Button>
@@ -143,7 +164,13 @@ export default function AccountsPage() {
           <Text>预算 {formatMoney(monthBudget?.total || 0, state.settings.currency)}</Text>
         </View>
         <View className="inline-form">
-          <Input className="inline-form__input" type="digit" placeholder="设置本月总预算" value={budgetInput} onInput={(event) => setBudgetInput(String(event.detail.value))} />
+          <Input
+            className="inline-form__input"
+            type="digit"
+            placeholder="设置本月总预算"
+            value={budgetInput}
+            onInput={(event) => setBudgetInput(String(event.detail.value))}
+          />
           <Button className="inline-form__button" onClick={saveBudget}>
             保存
           </Button>
