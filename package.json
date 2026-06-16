@@ -1,6 +1,6 @@
 {
   "name": "money-ledger-miniprogram",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "WeChat mini program money ledger built with Taro, React and TypeScript.",
   "packageManager": "pnpm@9.15.9",
