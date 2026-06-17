@@ -1,26 +1,36 @@
 import { Button, Text, View } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import BottomNav from '@/components/BottomNav'
+import { getCategoryPathLabel } from '@/modules/categories'
 import { getCategoryTotals, getDashboardStats, getMonthRecords, loadState, syncToCloud } from '@/store/finance'
 import { FinanceState } from '@/types'
-import { clampPercent, currentMonth, formatMoney, getAccount, getCategory, signedMoney } from '@/utils/format'
+import { clampPercent, currentMonth, formatMoney, getAccount, getCategory, signedMoney, todayISO } from '@/utils/format'
+import { useThemeClass } from '@/utils/theme'
 import './index.scss'
+
+const shortcuts = [
+  { label: '明细', mark: 'TX', url: '/pages/bills/index' },
+  { label: '预算', mark: 'BD', url: '/pages/accounts/index' },
+  { label: '统计', mark: 'AN', url: '/pages/analytics/index' },
+  { label: '管理', mark: 'MG', url: '/pages/profile/index' }
+]
 
 export default function HomePage() {
   const [state, setState] = useState<FinanceState>(() => loadState())
+  const currentThemeClass = useThemeClass(state.settings.theme)
 
-  useDidShow(() => {
-    setState(loadState())
-  })
+  useDidShow(() => setState(loadState()))
 
   const stats = getDashboardStats(state, currentMonth())
-  const todayRecords = getMonthRecords(state).filter((item) => item.date === new Date().toISOString().slice(0, 10))
-  const topCategories = getCategoryTotals(state, stats.records, 'expense').slice(0, 3)
+  const todayRecords = getMonthRecords(state).filter((item) => item.date === todayISO())
+  const topCategories = getCategoryTotals(state, stats.records, 'expense')
+  const topCategory = topCategories[0]
+  const budgetPercent = clampPercent(stats.budgetUsage)
 
-  const goAdd = () => Taro.navigateTo({ url: '/pages/add/index' })
-  const goAccounts = () => Taro.navigateTo({ url: '/pages/accounts/index' })
-  const goBills = () => Taro.redirectTo({ url: '/pages/bills/index' })
+  const recentRecords = useMemo(() => {
+    return (todayRecords.length ? todayRecords : stats.records).slice(0, 4)
+  }, [stats.records, todayRecords])
 
   const handleSync = async () => {
     await syncToCloud(state)
@@ -28,86 +38,103 @@ export default function HomePage() {
   }
 
   return (
-    <View className="page home-page">
-      <View className="top-title">
+    <View className={`page dashboard-page ${currentThemeClass}`}>
+      <View className="top-title dashboard-top">
         <View>
-          <Text className="brand">记账系统</Text>
-          <Text className="home-page__hello">今天也把钱花明白</Text>
+          <Text className="mono-label">Emerald Ledger</Text>
+          <Text className="brand">账务工作台</Text>
         </View>
-        <Button className="home-page__sync" onClick={handleSync}>
+        <Button className="ghost-button dashboard-sync" onClick={handleSync}>
           同步
         </Button>
       </View>
 
-      <View className="wallet-card">
-        <Text className="wallet-card__label">本月预算余额</Text>
-        <Text className="wallet-card__amount">{formatMoney(stats.balance, state.settings.currency)}</Text>
-        <View className="wallet-card__grid">
+      <View className="hero-card">
+        <View className="hero-card__head">
           <View>
-            <Text className="wallet-card__meta">月支出</Text>
-            <Text className="wallet-card__value">{formatMoney(stats.expense, state.settings.currency)}</Text>
+            <Text className="mono-label">Budget Balance</Text>
+            <Text className="hero-card__amount">{formatMoney(stats.balance, state.settings.currency)}</Text>
+          </View>
+          <View className="hero-card__badge">LIVE</View>
+        </View>
+
+        <View className="hero-card__metrics">
+          <View>
+            <Text className="caption">Monthly Income</Text>
+            <Text className="hero-card__metric amount-positive">
+              {formatMoney(stats.income, state.settings.currency)}
+            </Text>
           </View>
           <View>
-            <Text className="wallet-card__meta">月收入</Text>
-            <Text className="wallet-card__value">{formatMoney(stats.income, state.settings.currency)}</Text>
+            <Text className="caption">Monthly Expense</Text>
+            <Text className="hero-card__metric amount-negative">
+              {formatMoney(stats.expense, state.settings.currency)}
+            </Text>
           </View>
         </View>
-        <View className="budget-line">
+
+        <View className="budget-panel">
           <View className="row space-between">
-            <Text>预算使用</Text>
-            <Text>{clampPercent(stats.budgetUsage).toFixed(1)}%</Text>
+            <Text className="caption">Monthly Budget Usage</Text>
+            <Text className="caption">{budgetPercent.toFixed(1)}%</Text>
           </View>
-          <View className="budget-line__track">
-            <View className="budget-line__bar" style={{ width: `${clampPercent(stats.budgetUsage)}%` }} />
+          <View className="progress-track">
+            <View className="progress-bar" style={{ width: `${budgetPercent}%` }} />
           </View>
         </View>
       </View>
 
-      <View className="shortcut-grid">
-        <View className="shortcut" onClick={goAdd}>
-          <Text className="shortcut__icon">记</Text>
-          <Text>快速记账</Text>
-        </View>
-        <View className="shortcut" onClick={goBills}>
-          <Text className="shortcut__icon">单</Text>
-          <Text>账单明细</Text>
-        </View>
-        <View className="shortcut" onClick={goAccounts}>
-          <Text className="shortcut__icon">户</Text>
-          <Text>账户预算</Text>
-        </View>
-        <View className="shortcut" onClick={() => Taro.redirectTo({ url: '/pages/analytics/index' })}>
-          <Text className="shortcut__icon">析</Text>
-          <Text>统计分析</Text>
-        </View>
+      <View className="quick-grid">
+        {shortcuts.map((item) => (
+          <View key={item.label} className="quick-card" onClick={() => Taro.reLaunch({ url: item.url })}>
+            <Text className="quick-card__mark">{item.mark}</Text>
+            <Text>{item.label}</Text>
+          </View>
+        ))}
       </View>
 
-      <View className="section-heading">
-        <Text className="section-title">今日账单</Text>
-        <Text className="section-more" onClick={goBills}>
+      <View className="insight-card surface-card">
+        <View>
+          <Text className="mono-label">Analysis & Tips</Text>
+          <Text className="insight-card__title">本周消费洞察</Text>
+        </View>
+        <Text className="insight-card__text">
+          {topCategory
+            ? `${topCategory.category.name} 是本月最高支出分类，占总支出的 ${clampPercent(
+                (topCategory.total / (stats.expense || 1)) * 100
+              ).toFixed(0)}%。`
+            : '还没有足够的账单数据，先记录几笔交易吧。'}
+        </Text>
+      </View>
+
+      <View className="section-row">
+        <Text className="section-title">Today&apos;s Bills</Text>
+        <Text className="section-link" onClick={() => Taro.reLaunch({ url: '/pages/bills/index' })}>
           查看全部
         </Text>
       </View>
 
-      <View className="record-list">
-        {todayRecords.slice(0, 4).map((record) => {
+      <View className="record-stack">
+        {recentRecords.map((record) => {
           const category = getCategory(state.categories, record.categoryId)
+          const categoryLabel = getCategoryPathLabel(state.categories, record.categoryId)
           const account = getAccount(state.accounts, record.accountId)
           return (
-            <View key={record.id} className="record-card">
-              <View
-                className="record-card__icon"
-                style={{ background: `${category?.color || '#006d33'}1a`, color: category?.color }}
-              >
+            <View key={record.id} className="ledger-row surface-card">
+              <View className="ledger-row__icon" style={{ color: category?.color || '#45e17c' }}>
                 <Text>{category?.icon || '账'}</Text>
               </View>
-              <View className="record-card__body">
-                <Text className="record-card__name">{record.note || category?.name}</Text>
+              <View className="ledger-row__body">
+                <Text className="ledger-row__title">{record.note || category?.name || '未命名账单'}</Text>
                 <Text className="caption">
-                  {category?.name} · {account?.name}
+                  {categoryLabel || category?.name || '分类'} · {account?.name || '账户'}
                 </Text>
               </View>
-              <Text className={record.type === 'income' ? 'amount-positive' : 'amount-negative'}>
+              <Text
+                className={
+                  record.type === 'income' ? 'amount-positive ledger-row__amount' : 'amount-negative ledger-row__amount'
+                }
+              >
                 {signedMoney(record, state.settings.currency)}
               </Text>
             </View>
@@ -115,21 +142,9 @@ export default function HomePage() {
         })}
       </View>
 
-      <View className="insight-grid">
-        <View className="insight-card insight-card--warm">
-          <Text className="insight-card__label">消费洞察</Text>
-          <Text className="insight-card__text">
-            {topCategories[0]?.category.name || '餐饮'} 是本月最大支出项，记得关注预算节奏。
-          </Text>
-        </View>
-        <View className="insight-card insight-card--soft">
-          <Text className="insight-card__label">提醒</Text>
-          <Text className="insight-card__text">
-            {state.settings.reminder.enabled ? `${state.settings.reminder.time} 记账提醒已开启` : '记账提醒未开启'}
-          </Text>
-        </View>
-      </View>
-
+      <Button className="fab" onClick={() => Taro.navigateTo({ url: '/pages/add/index' })}>
+        +
+      </Button>
       <BottomNav active="home" />
     </View>
   )

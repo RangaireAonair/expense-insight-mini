@@ -12,14 +12,17 @@ import {
   updateSettings
 } from '@/store/finance'
 import { AppSettings, FinanceState } from '@/types'
+import { themeLabel, useThemeClass } from '@/utils/theme'
 import './index.scss'
 
 const currencies: AppSettings['currency'][] = ['CNY', 'USD']
-const themes: AppSettings['theme'][] = ['light', 'dark']
+const themes: AppSettings['theme'][] = ['system', 'light', 'dark']
+const themeOptions = themes.map(themeLabel)
 const repeats: AppSettings['reminder']['repeat'][] = ['daily', 'weekly']
 
 export default function ProfilePage() {
   const [state, setState] = useState<FinanceState>(() => loadState())
+  const currentThemeClass = useThemeClass(state.settings.theme)
 
   useDidShow(() => setState(loadState()))
 
@@ -95,7 +98,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <View className="page profile-page">
+    <View className={`page profile-page ${currentThemeClass}`}>
       <View className="top-title">
         <Text className="brand">我的</Text>
       </View>
@@ -119,13 +122,13 @@ export default function ProfilePage() {
         <Text className="setting-group__title">系统设置</Text>
         <Picker
           mode="selector"
-          range={themes}
+          range={themeOptions}
           value={themes.indexOf(state.settings.theme)}
           onChange={(event) => patchSettings({ theme: themes[Number(event.detail.value)] })}
         >
           <View className="setting-row">
             <Text>主题模式</Text>
-            <Text>{state.settings.theme === 'light' ? '浅色' : '深色'}</Text>
+            <Text>{themeLabel(state.settings.theme)}</Text>
           </View>
         </Picker>
         <Picker

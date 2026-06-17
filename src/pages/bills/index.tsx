@@ -2,9 +2,11 @@ import { Button, Input, Picker, Text, View } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { useMemo, useState } from 'react'
 import BottomNav from '@/components/BottomNav'
-import { groupRecordsByDay, loadState, removeRecord } from '@/store/finance'
+import { getCategoryPathLabel } from '@/modules/categories'
+import { groupRecordsByDay, loadState, removeRecord, upsertRecord } from '@/store/finance'
 import { FinanceState, MoneyRecord, RecordType } from '@/types'
-import { formatMoney, getAccount, getCategory, signedMoney } from '@/utils/format'
+import { createId, formatMoney, getAccount, getCategory, signedMoney, todayISO } from '@/utils/format'
+import { useThemeClass } from '@/utils/theme'
 import './index.scss'
 
 const periodOptions = ['按月', '按年']
@@ -12,11 +14,14 @@ const typeOptions = ['全部', '支出', '收入']
 
 export default function BillsPage() {
   const [state, setState] = useState<FinanceState>(() => loadState())
+  const currentThemeClass = useThemeClass(state.settings.theme)
   const [keyword, setKeyword] = useState('')
   const [periodIndex, setPeriodIndex] = useState(0)
   const [typeIndex, setTypeIndex] = useState(0)
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7))
   const [year, setYear] = useState(new Date().toISOString().slice(0, 4))
+  const [openRecordId, setOpenRecordId] = useState('')
+  const [touchStartX, setTouchStartX] = useState(0)
 
   useDidShow(() => setState(loadState()))
 
@@ -28,7 +33,7 @@ export default function BillsPage() {
       .filter((record) => (type === 'all' ? true : record.type === type))
       .filter((record) => {
         if (!keyword.trim()) return true
-        const category = getCategory(state.categories, record.categoryId)?.name || ''
+        const category = getCategoryPathLabel(state.categories, record.categoryId)
         const account = getAccount(state.accounts, record.accountId)?.name || ''
         const tags = record.tags.map((tagId) => state.tags.find((tag) => tag.id === tagId)?.name).join(' ')
         const haystack = `${record.note} ${category} ${account} ${tags}`
@@ -43,7 +48,36 @@ export default function BillsPage() {
   const income = filtered.filter((item) => item.type === 'income').reduce((sum, item) => sum + item.amount, 0)
 
   const editRecord = (record: MoneyRecord) => {
+    setOpenRecordId('')
     Taro.navigateTo({ url: `/pages/add/index?id=${record.id}` })
+  }
+
+  const refundRecord = (record: MoneyRecord) => {
+    if (record.type === 'income') {
+      Taro.showToast({ title: '收入账单无需退款', icon: 'none' })
+      return
+    }
+
+    Taro.showModal({
+      title: '生成退款',
+      content: `确认按 ${formatMoney(record.amount, state.settings.currency)} 生成退款记录吗？`,
+      success: (res) => {
+        if (!res.confirm) return
+        const nextState = upsertRecord({
+          id: createId('refund'),
+          type: 'income',
+          amount: record.amount,
+          categoryId: 'transfer_in',
+          accountId: record.accountId,
+          date: todayISO(),
+          note: `退款：${record.note || getCategoryPathLabel(state.categories, record.categoryId)}`,
+          tags: record.tags
+        })
+        setOpenRecordId('')
+        setState(nextState)
+        Taro.showToast({ title: '已生成退款', icon: 'success' })
+      }
+    })
   }
 
   const deleteRecord = (record: MoneyRecord) => {
@@ -53,14 +87,22 @@ export default function BillsPage() {
       success: (res) => {
         if (res.confirm) {
           setState(removeRecord(record.id))
+          setOpenRecordId('')
           Taro.showToast({ title: '已删除', icon: 'success' })
         }
       }
     })
   }
 
+  const handleTouchEnd = (recordId: string, event: TouchEvent) => {
+    const endX = event.changedTouches?.[0]?.clientX || touchStartX
+    const deltaX = endX - touchStartX
+    if (deltaX < -36) setOpenRecordId(recordId)
+    if (deltaX > 28) setOpenRecordId('')
+  }
+
   return (
-    <View className="page bills-page">
+    <View className={`page bills-page ${currentThemeClass}`}>
       <View className="top-title">
         <Text className="brand">账单明细</Text>
         <Button className="ghost-button" onClick={() => Taro.navigateTo({ url: '/pages/add/index' })}>
@@ -139,29 +181,49 @@ export default function BillsPage() {
               </View>
               {records.map((record) => {
                 const category = getCategory(state.categories, record.categoryId)
+                const categoryLabel = getCategoryPathLabel(state.categories, record.categoryId)
                 const account = getAccount(state.accounts, record.accountId)
                 return (
-                  <View key={record.id} className="bill-card">
-                    <View className="bill-card__main" onClick={() => editRecord(record)}>
-                      <View
-                        className="bill-card__icon"
-                        style={{ background: `${category?.color || '#006d33'}1a`, color: category?.color }}
-                      >
-                        <Text>{category?.icon || '账'}</Text>
-                      </View>
-                      <View className="bill-card__body">
-                        <Text className="bill-card__title">{record.note || category?.name}</Text>
-                        <Text className="caption">
-                          {category?.name} · {account?.name}
+                  <View
+                    key={record.id}
+                    className={`bill-swipe ${openRecordId === record.id ? 'bill-swipe--open' : ''}`}
+                    onTouchStart={
+                      // @ts-expect-error Taro touch event exposes changedTouches at runtime.
+                      (event) => setTouchStartX(event.changedTouches?.[0]?.clientX || 0)
+                    }
+                    // @ts-expect-error Taro touch event exposes changedTouches at runtime.
+                    onTouchEnd={(event) => handleTouchEnd(record.id, event)}
+                  >
+                    <View className="bill-actions">
+                      <Button className="bill-action bill-action--edit" onClick={() => editRecord(record)}>
+                        编辑
+                      </Button>
+                      <Button className="bill-action bill-action--refund" onClick={() => refundRecord(record)}>
+                        退款
+                      </Button>
+                      <Button className="bill-action bill-action--delete" onClick={() => deleteRecord(record)}>
+                        删除
+                      </Button>
+                    </View>
+                    <View className="bill-card">
+                      <View className="bill-card__main" onClick={() => editRecord(record)}>
+                        <View
+                          className="bill-card__icon"
+                          style={{ background: `${category?.color || '#006d33'}1a`, color: category?.color }}
+                        >
+                          <Text>{category?.icon || '账'}</Text>
+                        </View>
+                        <View className="bill-card__body">
+                          <Text className="bill-card__title">{record.note || category?.name}</Text>
+                          <Text className="caption">
+                            {categoryLabel || category?.name} · {account?.name}
+                          </Text>
+                        </View>
+                        <Text className={record.type === 'income' ? 'amount-positive' : 'amount-negative'}>
+                          {signedMoney(record, state.settings.currency)}
                         </Text>
                       </View>
-                      <Text className={record.type === 'income' ? 'amount-positive' : 'amount-negative'}>
-                        {signedMoney(record, state.settings.currency)}
-                      </Text>
                     </View>
-                    <Button className="bill-card__delete" onClick={() => deleteRecord(record)}>
-                      删除
-                    </Button>
                   </View>
                 )
               })}

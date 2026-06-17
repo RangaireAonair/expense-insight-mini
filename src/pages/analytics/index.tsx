@@ -12,6 +12,7 @@ import {
 } from '@/store/finance'
 import { FinanceState, RecordType } from '@/types'
 import { clampPercent, formatMoney } from '@/utils/format'
+import { useThemeClass } from '@/utils/theme'
 import './index.scss'
 
 const tabLabels = ['支出', '收入']
@@ -19,6 +20,7 @@ const rangeLabels = ['月度', '年度']
 
 export default function AnalyticsPage() {
   const [state, setState] = useState<FinanceState>(() => loadState())
+  const currentThemeClass = useThemeClass(state.settings.theme)
   const [type, setType] = useState<RecordType>('expense')
   const [rangeIndex, setRangeIndex] = useState(0)
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7))
@@ -51,8 +53,12 @@ export default function AnalyticsPage() {
   const trend = useMemo(() => getMonthlyTrend(state), [state])
 
   const drawCharts = useCallback(() => {
-    drawPie(categoryTotals.map((item) => ({ value: item.total, color: item.category.color })))
-    drawTrend(trend)
+    try {
+      drawPie(categoryTotals.map((item) => ({ value: item.total, color: item.category.color })))
+      drawTrend(trend)
+    } catch (error) {
+      console.warn('draw analytics charts failed', error)
+    }
   }, [categoryTotals, trend])
 
   useReady(() => setTimeout(drawCharts, 100))
@@ -62,7 +68,7 @@ export default function AnalyticsPage() {
   }, [drawCharts])
 
   return (
-    <View className="page analytics-page">
+    <View className={`page analytics-page ${currentThemeClass}`}>
       <View className="top-title">
         <Text className="brand">统计报表</Text>
         <Picker
@@ -215,6 +221,7 @@ function drawPie(items: Array<{ value: number; color: string }>) {
 }
 
 function drawTrend(rows: Array<{ month: string; income: number; expense: number }>) {
+  if (!rows.length) return
   const ctx = Taro.createCanvasContext('trendCanvas')
   const width = 320
   const height = 150

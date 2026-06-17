@@ -14,5 +14,6 @@ export default defineAppConfig({
     navigationBarTextStyle: 'black',
     backgroundColor: '#f3fcf0'
   },
+  darkmode: true,
   lazyCodeLoading: 'requiredComponents'
 })

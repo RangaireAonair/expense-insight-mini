@@ -27,7 +27,7 @@ export default defineConfig(async (merge, { command: _command, mode: _mode }) =>
     framework: 'react',
     compiler: 'webpack5',
     cache: {
-      enable: false
+      enable: true
     },
     mini: {
       postcss: {

@@ -1,20 +1,16 @@
 import Taro from '@tarojs/taro'
+import {
+  categoryContains,
+  createCustomCategory,
+  defaultCategories,
+  getCategory,
+  getCategoryPathLabel,
+  normalizeCategories
+} from '@/modules/categories'
 import { Account, Budget, Category, FinanceState, MoneyRecord, RecordType, Tag, UserProfile } from '@/types'
 import { createId, currentMonth, monthOf, sumByType, todayISO, yearOf } from '@/utils/format'
 
 const STORAGE_KEY = 'money-ledger-state-v1'
-
-export const defaultCategories: Category[] = [
-  { id: 'food', name: '餐饮', type: 'expense', icon: '餐', color: '#006d33' },
-  { id: 'transport', name: '交通', type: 'expense', icon: '行', color: '#3d4a3d' },
-  { id: 'shopping', name: '购物', type: 'expense', icon: '购', color: '#ffa504' },
-  { id: 'entertainment', name: '娱乐', type: 'expense', icon: '乐', color: '#a23d33' },
-  { id: 'housing', name: '居住', type: 'expense', icon: '住', color: '#006d33' },
-  { id: 'medical', name: '医疗', type: 'expense', icon: '医', color: '#a23d33' },
-  { id: 'salary', name: '工资', type: 'income', icon: '薪', color: '#07c160' },
-  { id: 'bonus', name: '奖金', type: 'income', icon: '奖', color: '#45e17c' },
-  { id: 'transfer_in', name: '转入', type: 'income', icon: '入', color: '#006d33' }
-]
 
 export const defaultTags: Tag[] = [
   { id: 'work', name: '工作日' },
@@ -31,13 +27,13 @@ export const defaultAccounts: Account[] = [
 ]
 
 const seedRecords: MoneyRecord[] = [
-  sampleRecord('expense', 45, 'food', 'wechat', todayISO(), '午餐', ['work']),
+  sampleRecord('expense', 45, 'food-lunch', 'wechat', todayISO(), '午餐', ['work']),
   sampleRecord('income', 1200, 'bonus', 'bank', todayISO(), '项目尾款', ['reimburse']),
-  sampleRecord('expense', 22.8, 'shopping', 'alipay', todayISO(), '便利店', []),
-  sampleRecord('expense', 34, 'transport', 'wechat', todayISO(), '打车', ['work']),
-  sampleRecord('expense', 120, 'shopping', 'alipay', offsetDate(-1), '优衣库购物', ['family']),
+  sampleRecord('expense', 22.8, 'shopping-daily', 'alipay', todayISO(), '便利店', []),
+  sampleRecord('expense', 34, 'transport-taxi', 'wechat', todayISO(), '打车', ['work']),
+  sampleRecord('expense', 120, 'shopping-clothes', 'alipay', offsetDate(-1), '优衣库购物', ['family']),
   sampleRecord('income', 7000, 'salary', 'bank', offsetDate(-2), '月薪', []),
-  sampleRecord('expense', 5.5, 'food', 'cash', offsetDate(-3), '咖啡', [])
+  sampleRecord('expense', 5.5, 'food-drink-coffee', 'cash', offsetDate(-3), '咖啡', [])
 ]
 
 function sampleRecord(
@@ -89,7 +85,7 @@ export function createInitialState(): FinanceState {
       }
     ],
     settings: {
-      theme: 'light',
+      theme: 'system',
       currency: 'CNY',
       syncMode: 'local',
       privacyMode: false,
@@ -105,9 +101,27 @@ export function createInitialState(): FinanceState {
 export function loadState(): FinanceState {
   try {
     const cached = Taro.getStorageSync<FinanceState>(STORAGE_KEY)
-    return cached || createInitialState()
+    return normalizeState(cached || createInitialState())
   } catch (error) {
     return createInitialState()
+  }
+}
+
+function normalizeState(state: FinanceState): FinanceState {
+  const defaults = createInitialState()
+
+  return {
+    ...defaults,
+    ...state,
+    categories: normalizeCategories(state.categories),
+    settings: {
+      ...defaults.settings,
+      ...state.settings,
+      reminder: {
+        ...defaults.settings.reminder,
+        ...state.settings?.reminder
+      }
+    }
   }
 }
 
@@ -162,16 +176,10 @@ export function removeRecord(id: string) {
   return state
 }
 
-export function addCustomCategory(name: string, type: RecordType) {
+export function addCustomCategory(name: string, type: RecordType, parentId?: string) {
   const state = loadState()
-  const category: Category = {
-    id: createId('category'),
-    name,
-    type,
-    icon: name.slice(0, 1),
-    color: type === 'income' ? '#07c160' : '#ffa504',
-    custom: true
-  }
+  const parent = parentId ? getCategory(state.categories, parentId) : undefined
+  const category: Category = createCustomCategory(name, type, parent)
   state.categories.push(category)
   saveState(state)
   return category
@@ -251,10 +259,10 @@ export function groupRecordsByDay(records: MoneyRecord[]) {
 
 export function getCategoryTotals(state: FinanceState, records: MoneyRecord[], type: RecordType) {
   return state.categories
-    .filter((category) => category.type === type || category.type === 'both')
+    .filter((category) => !category.parentId && (category.type === type || category.type === 'both'))
     .map((category) => {
       const total = records
-        .filter((record) => record.type === type && record.categoryId === category.id)
+        .filter((record) => record.type === type && categoryContains(state.categories, category.id, record.categoryId))
         .reduce((sum, record) => sum + record.amount, 0)
       return { category, total }
     })
@@ -307,7 +315,7 @@ export async function syncToCloud(state: FinanceState) {
 export function exportCsv(state: FinanceState) {
   const header = '日期,类型,金额,分类,账户,标签,备注'
   const rows = state.records.map((record) => {
-    const category = state.categories.find((item) => item.id === record.categoryId)?.name || ''
+    const category = getCategoryPathLabel(state.categories, record.categoryId)
     const account = state.accounts.find((item) => item.id === record.accountId)?.name || ''
     const tags = record.tags
       .map((tagId) => state.tags.find((tag) => tag.id === tagId)?.name)

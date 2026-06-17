@@ -5,10 +5,12 @@ import BottomNav from '@/components/BottomNav'
 import { addAccount, getDashboardStats, loadState, transferBetweenAccounts, updateBudget } from '@/store/finance'
 import { FinanceState } from '@/types'
 import { clampPercent, currentMonth, formatMoney } from '@/utils/format'
+import { useThemeClass } from '@/utils/theme'
 import './index.scss'
 
 export default function AccountsPage() {
   const [state, setState] = useState<FinanceState>(() => loadState())
+  const currentThemeClass = useThemeClass(state.settings.theme)
   const [newAccount, setNewAccount] = useState('')
   const [newBalance, setNewBalance] = useState('')
   const [fromIndex, setFromIndex] = useState(0)
@@ -53,7 +55,7 @@ export default function AccountsPage() {
   }
 
   return (
-    <View className="page accounts-page">
+    <View className={`page accounts-page ${currentThemeClass}`}>
       <View className="top-title">
         <Text className="brand">账户预算</Text>
         <Button className="ghost-button" onClick={() => Taro.redirectTo({ url: '/pages/profile/index' })}>

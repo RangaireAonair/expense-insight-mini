@@ -69,12 +69,59 @@
   font-size: 23rpx;
 }
 
+.bill-swipe {
+  position: relative;
+  margin-bottom: 12rpx;
+  overflow: hidden;
+  border-radius: 24rpx;
+}
+
+.bill-actions {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 270rpx;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
+  border-radius: 24rpx;
+}
+
+.bill-action {
+  height: 100%;
+  border-radius: 0;
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.bill-action--edit {
+  background: #3d8bfd;
+}
+
+.bill-action--refund {
+  background: #07c160;
+}
+
+.bill-action--delete {
+  background: #ba1a1a;
+}
+
 .bill-card {
   margin-bottom: 12rpx;
   padding: 18rpx;
   border-radius: 24rpx;
   background: #ffffff;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  transform: translateX(0);
+  transition: transform 0.18s ease;
+}
+
+.bill-swipe .bill-card {
+  margin-bottom: 0;
+}
+
+.bill-swipe--open .bill-card {
+  transform: translateX(-270rpx);
 }
 
 .bill-card__main {
@@ -103,17 +150,6 @@
   display: block;
   font-size: 28rpx;
   font-weight: 650;
-}
-
-.bill-card__delete {
-  margin-top: 12rpx;
-  margin-left: auto;
-  width: 112rpx;
-  height: 54rpx;
-  border-radius: 999rpx;
-  background: #ffdad6;
-  color: #93000a;
-  font-size: 24rpx;
 }
 
 .empty {

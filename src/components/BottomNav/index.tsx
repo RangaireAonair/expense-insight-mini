@@ -21,7 +21,17 @@ const items: NavItem[] = [
 export default function BottomNav({ active }: { active: NavKey }) {
   const go = (item: NavItem) => {
     if (item.key === active) return
-    Taro.redirectTo({ url: item.url })
+    Taro.reLaunch({
+      url: item.url,
+      fail: () => {
+        Taro.redirectTo({
+          url: item.url,
+          fail: () => {
+            Taro.navigateTo({ url: item.url })
+          }
+        })
+      }
+    })
   }
 
   return (

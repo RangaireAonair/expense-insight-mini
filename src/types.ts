@@ -12,6 +12,8 @@ export interface Category {
   type: RecordType | 'both'
   icon: string
   color: string
+  parentId?: string
+  level?: 1 | 2 | 3
   custom?: boolean
 }
 
@@ -54,7 +56,7 @@ export interface ReminderSetting {
 }
 
 export interface AppSettings {
-  theme: 'light' | 'dark'
+  theme: 'light' | 'dark' | 'system'
   currency: 'CNY' | 'USD'
   syncMode: 'local' | 'cloud'
   privacyMode: boolean
